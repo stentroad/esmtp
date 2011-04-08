@@ -37,7 +37,11 @@ init(MX,Ehlo,From,To,Msg) ->
 sendemail({Host,Port,SSL,Login},Ehlo,From,To,Msg) ->
     {ok, S0} = esmtp_sock:connect(Host, Port, SSL),
     {ok, S1, {220, _, _Banner}} = esmtp_sock:read_response_all(S0),
-    {ok, S2, {250, _, _Msg}} = esmtp_sock:command(S1, {ehlo, Ehlo}),
+    {ok, S2, {250, _, _Msg}} = case esmtp_sock:command(S1, {ehlo, Ehlo}) of
+                                   {ok, S2_1, {500, _, _}} ->
+                                       esmtp_sock:command(S2_1, {helo, Ehlo});
+                                   X -> X
+                               end,
     AuthS = case Login of
                 {User,Pass} ->
                     {ok, S3, {334,_, _}} = esmtp_sock:command(S2, {auth, "PLAIN"}),
