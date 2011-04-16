@@ -7,3 +7,4 @@ doc/erlang.png
 doc/stylesheet.css
 src/TAGS
 ebin/*.beam
+ebin/esmtp.app
